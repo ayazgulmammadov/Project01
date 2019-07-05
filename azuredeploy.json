@@ -280,6 +280,37 @@
       },
       "resources": [
         {
+          "name": "[variables('databaseName')]",
+          "type": "databases",
+          "apiVersion": "2015-01-01",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('dev-env-sql-serverName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('dev-env-sql-serverName')), '/elasticpools/elasticpool-01')]"
+          ],
+          "properties": {
+            "elasticPoolName": "[variables('elasticPoolName')]"
+          },
+          "resources": [
+            {
+              "name": "Import",
+              "type": "extensions",
+              "apiVersion": "2014-04-01",
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('databaseName'))]"
+              ],
+              "properties": {
+                "storageKeyType": "StorageAccessKey",
+                "storageKey": "5yUKQk4X630dkQN1f5U3RUGH48xhQtfmmO37VhDlenmp9e7ESBUn06V0DK1rgp+DFFjaXmde9FEWpZScOXA/Bg==",
+                "storageUri": "https://project1artifacts.blob.core.windows.net/backups/Blog.bacpac",
+                "administratorLogin": "[parameters('sqlServerAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+                "operationMode": "Import"
+              }
+            }
+          ]
+        },
+        {
           "name": "AllowAllWindowsAzureIps",
           "type": "firewallRules",
           "location": "[resourceGroup().location]",
@@ -288,8 +319,8 @@
             "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
           ],
           "properties": {
-            "startIpAddress": "10.0.0.1",
-            "endIpAddress": "10.0.0.254"
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
           }
         },
         {
