@@ -68,7 +68,8 @@
     "dsc-iis-configArchiveFolder": "DSC",
     "dsc-iis-configArchiveFileName": "dsc-iis-config.zip",
     "sqlServerName": "[concat('sql-server-', uniqueString(resourceGroup().id))]",
-    "elasticPoolName": "elasticpool-01"
+    "elasticPoolName": "elasticpool-01",
+    "databaseName": "project1db"
   },
   "resources": [
     {
