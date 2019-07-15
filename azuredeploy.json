@@ -286,8 +286,8 @@
           "apiVersion": "2015-01-01",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('dev-env-sql-serverName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('dev-env-sql-serverName')), '/elasticpools/elasticpool-01')]"
+            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlServerName')), '/elasticpools/', variables('elasticPoolName'))]"
           ],
           "properties": {
             "elasticPoolName": "[variables('elasticPoolName')]"
@@ -302,8 +302,8 @@
               ],
               "properties": {
                 "storageKeyType": "StorageAccessKey",
-                "storageKey": "5yUKQk4X630dkQN1f5U3RUGH48xhQtfmmO37VhDlenmp9e7ESBUn06V0DK1rgp+DFFjaXmde9FEWpZScOXA/Bg==",
-                "storageUri": "https://project1artifacts.blob.core.windows.net/backups/Blog.bacpac",
+                "storageKey": "QYYWlK9mvvPs5YvUMBspINrdCKdRBB7wg2PhYq0IGLxj4uv1m/hGsTA+1MiqaOJacNGvYiYMCSRY2NJC6BbGhw==",
+                "storageUri": "https://dbbackupblogge.blob.core.windows.net/dbbackup/newBlog.bacpac",
                 "administratorLogin": "[parameters('sqlServerAdminLogin')]",
                 "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
                 "operationMode": "Import"
