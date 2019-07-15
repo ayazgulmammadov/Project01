@@ -29,6 +29,16 @@ Configuration Main
             Name      = "Web-Mgmt-Service"
             DependsOn = "[WindowsFeature]InstallWebServer"
         }
+        WindowsFeature InstallASP {
+            Ensure    = "Present"
+            Name      = "Web-Asp-Net45"
+            DependsOn = "[WindowsFeature]InstallWebServer"
+        }
+        WindowsFeature WindowsAuthentication {
+            Name   = "Web-Windows-Auth"
+            Ensure = "Present"
+            DependsOn = "[WindowsFeature]InstallWebServer"
+        }
         xRemoteFile DownloadURLRewrite {
             Uri             = "https://download.microsoft.com/download/C/9/E/C9E8180D-4E51-40A6-A9BF-776990D8BCA9/rewrite_amd64.msi"
             DestinationPath = "C:\rewrite_amd64.msi"
@@ -61,6 +71,12 @@ Configuration Main
             Path      = "C:\WebDeploy_amd64_en-US.msi"
             ProductId = "6773A61D-755B-4F74-95CC-97920E45E696"
             DependsOn = @("[xRemoteFile]DownloadWebDeploy", "[WindowsFeature]InstallWebMgmtService")
+        }
+        Service RunWebMgmtService {
+            Name = "WMSVC"
+            StartupType = "Automatic"
+            State = "Running"
+            DependsOn = "[Package]InstallWebDeploy"
         }
         xWebsite DefaultSite {
             Ensure       = "Present"
