@@ -15,6 +15,20 @@ Configuration Main
 
     Node $nodeName
     {
+        if ($nodeName -contains "prod"){
+            WindowsFeature WebCompression {
+                Ensure = "Present"
+                Name = "Web-Dyn-Compression"
+                DependsOn = "[WindowsFeature]InstallWebServer"
+            }
+            xWebAppPoolDefaults PoolDefaults
+            {
+                ApplyTo                 = 'Machine'
+                ManagedRuntimeVersion   = 'v4.0'
+                IdentityType            = 'LocalSystem'
+                DependsOn = "[xWebAppPool]BloggeAppPool"
+            }
+        }
         WindowsFeature InstallWebServer {
             Ensure = "Present"
             Name   = "Web-Server"
@@ -98,7 +112,7 @@ Configuration Main
             PhysicalPath = "C:\inetpub\wwwroot"
             DependsOn    = "[WindowsFeature]InstallWebServer" 
         }
-        xWebAppPool ProjectAppPool {
+        xWebAppPool BloggeAppPool {
             Name = "BloggeAppPool"
         }
         xWebsite WebSite {
@@ -107,7 +121,7 @@ Configuration Main
             State        = "Started"
             PhysicalPath = "C:\inetpub\wwwroot\Blogge"
             ApplicationPool = "BloggeAppPool"
-            DependsOn    = @("[File]CreateFolder", "[Script]InstallCert", "[xWebAppPool]ProjectAppPool")
+            DependsOn    = @("[File]CreateFolder", "[Script]InstallCert", "[xWebAppPool]BloggeAppPool")
             BindingInfo  = @(
                 MSFT_xWebBindingInformation {
                     Protocol  = "HTTP" 
