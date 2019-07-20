@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "envPrefix": {
+      "value": "dev-",
+      "metadata": {
+        "description": "Enviroment prefix"
+      }
+    },
+    "nsgSecurityRules": {
+      "value": {
+        "securityRules": [
+          {
+            "name": "Allow8172",
+            "properties": {
+              "description": "Allow port 8172",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "8172",
+              "protocol": "Tcp",
+              "direction": "Inbound",
+              "priority": 100,
+              "access": "Allow"
+            }
+          },
+          {
+            "name": "DenyPublicInbound",
+            "properties": {
+              "description": "Block all public incoming traffic",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRange": "*",
+              "protocol": "*",
+              "direction": "Inbound",
+              "priority": 101,
+              "access": "Deny"
+            }
+          }
+        ]
+      }
+    },
+    "vmName": {
+      "value": "dev-vm01"
+    },
+    "vmAdminUserName": {
+      "value": "adminuser"
+    },
+    "vmAdminPassword": {
+      "value": "A123456789a!"
+    },
+    "sqlServerAdminLogin": {
+      "value": "sqlsuperadm"
+    },
+    "sqlServerAdminPassword": {
+      "value": "A123456789a!"
+    },
+    "publicIPDnsName": {
+      "value": "blogge-dev-public"
+    },
+    "certPassword": {
+      "value": "A123456789a"
+    }
+  }
+}

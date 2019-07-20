@@ -54,7 +54,7 @@ Configuration Main
         File CreateFolder {
             Ensure          = "Present"
             Type            = "Directory"
-            DestinationPath = "C:\inetpub\wwwroot\Project1"
+            DestinationPath = "C:\inetpub\wwwroot\Blogge"
             DependsOn       = "[WindowsFeature]InstallWebServer"
         }
         Package InstallURLRewrite {
@@ -63,21 +63,34 @@ Configuration Main
             Path      = "C:\rewrite_amd64.msi"
             ProductId = "08F0318A-D113-4CF0-993E-50F191D397AD"
             DependsOn = @("[xRemoteFile]DownloadURLRewrite", "[WindowsFeature]InstallWebServer")
-
         }
         Package InstallWebDeploy {
             Name      = "Microsoft Web Deploy 3.6"
             Ensure    = "Present"
             Path      = "C:\WebDeploy_amd64_en-US.msi"
+            Arguments = "ADDLOCAL=ALL"
             ProductId = "6773A61D-755B-4F74-95CC-97920E45E696"
             DependsOn = @("[xRemoteFile]DownloadWebDeploy", "[WindowsFeature]InstallWebMgmtService")
         }
-        Service RunWebMgmtService {
+        Service WebMgmtService {
             Name = "WMSVC"
             StartupType = "Automatic"
             State = "Running"
-            DependsOn = "[Package]InstallWebDeploy"
+            DependsOn = @("[Registry]RemoteManagement", "[Package]InstallWebDeploy")
         }
+        Service WebDeployRemoteAgent {
+            Name = "MsDepSvc"
+            StartupType = "Automatic"
+            State = "Running"
+            DependsOn = @("[Registry]RemoteManagement", "[Package]InstallWebDeploy")
+        }
+        Registry RemoteManagement {
+            Key = 'HKLM:\SOFTWARE\Microsoft\WebManagement\Server'
+            ValueName = 'EnableRemoteManagement'
+            ValueType = 'Dword'
+            ValueData = '1'
+            DependsOn = "[WindowsFeature]InstallWebMgmtService"
+       }
         xWebsite DefaultSite {
             Ensure       = "Present"
             Name         = "Default Web Site"
@@ -85,12 +98,16 @@ Configuration Main
             PhysicalPath = "C:\inetpub\wwwroot"
             DependsOn    = "[WindowsFeature]InstallWebServer" 
         }
+        xWebAppPool ProjectAppPool {
+            Name = "BloggeAppPool"
+        }
         xWebsite WebSite {
             Ensure       = "Present"
             Name         = "Project1"
             State        = "Started"
-            PhysicalPath = "C:\inetpub\wwwroot\Project1"
-            DependsOn    = @("[File]CreateFolder", "[Script]InstallCert")
+            PhysicalPath = "C:\inetpub\wwwroot\Blogge"
+            ApplicationPool = "BloggeAppPool"
+            DependsOn    = @("[File]CreateFolder", "[Script]InstallCert", "[xWebAppPool]ProjectAppPool")
             BindingInfo  = @(
                 MSFT_xWebBindingInformation {
                     Protocol  = "HTTP" 

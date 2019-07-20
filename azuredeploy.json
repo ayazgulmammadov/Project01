@@ -2,18 +2,23 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "envPrefix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nsgSecurityRules": {
+      "type": "object"
+    },
     "vmName": {
       "type": "string",
       "minLength": 1
     },
     "vmAdminUserName": {
       "type": "string",
-      "minLength": 1,
-      "defaultValue": "adminuser"
+      "minLength": 1
     },
     "vmAdminPassword": {
-      "type": "securestring",
-      "defaultValue": "A123456789a!"
+      "type": "securestring"
     },
     "vmWindowsOSVersion": {
       "type": "string",
@@ -26,7 +31,7 @@
         "Windows-Server-Technical-Preview"
       ]
     },
-    "vmPublicDnsName": {
+    "publicIPDnsName": {
       "type": "string",
       "minLength": 1
     },
@@ -57,70 +62,43 @@
     "vnetPrefix": "10.0.0.0/16",
     "vnetSubnetName": "Subnet-1",
     "vnetSubnetPrefix": "10.0.0.0/24",
+    "nsgName": "[concat(parameters('envPrefix'), 'nsg')]",
+    "vnetName": "[concat(parameters('envPrefix'), 'vnet')]",
     "vmImagePublisher": "MicrosoftWindowsServer",
     "vmImageOffer": "WindowsServer",
     "vmOSDiskName": "[concat(parameters('vmName'), '-osdisk')]",
     "vmSize": "Standard_D2_v2",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'dev-vnet')]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
     "vmSubnetRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetName'))]",
     "vmNicName": "[concat(parameters('vmName'), '-nic')]",
-    "publicIPName": "dev-publicip",
+    "publicIPName": "[concat(parameters('envPrefix'), 'publicip')]",
     "dsc-iis-configArchiveFolder": "DSC",
     "dsc-iis-configArchiveFileName": "dsc-iis-config.zip",
-    "sqlServerName": "[concat('sql-server-', uniqueString(resourceGroup().id))]",
+    "sqlServerName": "[concat('sql-server-', parameters('envPrefix'), uniqueString(resourceGroup().id))]",
     "elasticPoolName": "elasticpool-01",
-    "databaseName": "project1db"
+    "databaseName": "[concat('blogge', parameters('envPrefix'))]"
   },
   "resources": [
     {
-      "name": "dev-nsg",
+      "name": "[variables('nsgName')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "location": "[resourceGroup().location]",
       "apiVersion": "2018-12-01",
       "dependsOn": [],
       "properties": {
-        "securityRules": [
-          {
-            "name": "Allow8172",
-            "properties": {
-              "description": "Allow port 8172",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "8172",
-              "protocol": "Tcp",
-              "direction": "Inbound",
-              "priority": 100,
-              "access": "Allow"
-            }
-          },
-          {
-            "name": "DenyPublicInbound",
-            "properties": {
-              "description": "Block all public incoming traffic",
-              "sourceAddressPrefix": "Internet",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRange": "*",
-              "protocol": "*",
-              "direction": "Inbound",
-              "priority": 101,
-              "access": "Deny"
-            }
-          }
-        ]
+        "securityRules": "[parameters('nsgSecurityRules')]"
       }
     },
     {
-      "name": "dev-vnet",
+      "name": "[variablses('vnetName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', 'dev-nsg')]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
       ],
       "tags": {
-        "displayName": "dev-vnet"
+        "displayName": "VNet"
       },
       "properties": {
         "addressSpace": {
@@ -134,7 +112,7 @@
             "properties": {
               "addressPrefix": "[variables('vnetSubnetPrefix')]",
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'dev-nsg')]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
               }
             }
           }
@@ -147,12 +125,9 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', 'dev-vnet')]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPName'))]"
       ],
-      "tags": {
-        "displayName": "dev-vm-Nic"
-      },
       "properties": {
         "ipConfigurations": [
           {
@@ -178,9 +153,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('vmNicName'))]"
       ],
-      "tags": {
-        "displayName": "dev-vm"
-      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[variables('vmSize')]"
@@ -256,13 +228,10 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [],
-      "tags": {
-        "displayName": "dev-publicip"
-      },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
-          "domainNameLabel": "[parameters('vmPublicDnsName')]"
+          "domainNameLabel": "[parameters('publicIPDnsName')]"
         }
       }
     },
@@ -270,47 +239,14 @@
       "name": "[variables('sqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2018-06-01-preview",
       "dependsOn": [ ],
-      "tags": {
-        "displayName": "dev-sql-server"
-      },
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminLogin')]",
-        "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]"
+        "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+        "version": "12.0"
       },
       "resources": [
-        {
-          "name": "[variables('databaseName')]",
-          "type": "databases",
-          "apiVersion": "2015-01-01",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlServerName')), '/elasticpools/', variables('elasticPoolName'))]"
-          ],
-          "properties": {
-            "elasticPoolName": "[variables('elasticPoolName')]"
-          },
-          "resources": [
-            {
-              "name": "Import",
-              "type": "extensions",
-              "apiVersion": "2014-04-01",
-              "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('databaseName'))]"
-              ],
-              "properties": {
-                "storageKeyType": "StorageAccessKey",
-                "storageKey": "QYYWlK9mvvPs5YvUMBspINrdCKdRBB7wg2PhYq0IGLxj4uv1m/hGsTA+1MiqaOJacNGvYiYMCSRY2NJC6BbGhw==",
-                "storageUri": "https://dbbackupblogge.blob.core.windows.net/dbbackup/newBlog.bacpac",
-                "administratorLogin": "[parameters('sqlServerAdminLogin')]",
-                "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
-                "operationMode": "Import"
-              }
-            }
-          ]
-        },
         {
           "name": "AllowAllWindowsAzureIps",
           "type": "firewallRules",
@@ -338,6 +274,38 @@
             "databaseDtuMin": 0,
             "databaseDtuMax": 50
           }
+        },
+        {
+          "name": "[variables('databaseName')]",
+          "type": "databases",
+          "apiVersion": "2018-06-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/elasticPools', variables('sqlServerName'), variables('elasticPoolName'))]"
+          ],
+          "properties": {
+            "requestedServiceObjectiveName": "ElasticPool",
+            "elasticPoolName": "[variables('elasticPoolName')]"
+          },
+          "resources": [
+            {
+              "name": "Import",
+              "type": "extensions",
+              "apiVersion": "2014-04-01-preview",
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('databaseName'))]"
+              ],
+              "properties": {
+                "storageKeyType": "StorageAccessKey",
+                "storageKey": "QYYWlK9mvvPs5YvUMBspINrdCKdRBB7wg2PhYq0IGLxj4uv1m/hGsTA+1MiqaOJacNGvYiYMCSRY2NJC6BbGhw==",
+                "storageUri": "https://dbbackupblogge.blob.core.windows.net/dbbackup/newBlog.bacpac",
+                "administratorLogin": "[parameters('sqlServerAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+                "operationMode": "Import"
+              }
+            }
+          ]
         }
       ]
     }
