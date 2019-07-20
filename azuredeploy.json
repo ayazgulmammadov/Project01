@@ -76,7 +76,7 @@
     "dsc-iis-configArchiveFileName": "dsc-iis-config.zip",
     "sqlServerName": "[concat('sql-server-', parameters('envPrefix'), uniqueString(resourceGroup().id))]",
     "elasticPoolName": "elasticpool-01",
-    "databaseName": "[concat('blogge', parameters('envPrefix'))]"
+    "databaseName": "blogge"
   },
   "resources": [
     {
@@ -86,7 +86,7 @@
       "apiVersion": "2018-12-01",
       "dependsOn": [],
       "properties": {
-        "securityRules": "[parameters('nsgSecurityRules')]"
+        "securityRules": "[parameters('nsgSecurityRules').securityRules]"
       }
     },
     {
@@ -285,8 +285,7 @@
             "[resourceId('Microsoft.Sql/servers/elasticPools', variables('sqlServerName'), variables('elasticPoolName'))]"
           ],
           "properties": {
-            "requestedServiceObjectiveName": "ElasticPool",
-            "elasticPoolName": "[variables('elasticPoolName')]"
+            "elasticPoolId": "[resourceId('Microsoft.Sql/servers/elasticPools', variables('sqlServerName'), variables('elasticPoolName'))]"
           },
           "resources": [
             {
