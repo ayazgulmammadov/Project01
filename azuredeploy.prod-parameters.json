@@ -71,7 +71,7 @@
             }
         },
         "vmName": {
-            "value": "vm01"
+            "value": "prod-vm01"
         },
         "vmAdminUserName": {
             "value": "adminuser"
