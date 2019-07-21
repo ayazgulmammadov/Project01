@@ -316,7 +316,7 @@
     },
     "dbName": {
       "type": "string",
-      "value": "[reference(variables('databaseName')]"
+      "value": "[reference(variables('databaseName'))]"
     },
     "ServerFqdn": {
       "type": "string",
