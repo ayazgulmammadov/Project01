@@ -240,7 +240,7 @@
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "apiVersion": "2018-06-01-preview",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminLogin')]",
         "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
@@ -309,5 +309,18 @@
       ]
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "SqlServerURL": {
+      "type": "string",
+      "value": "[reference(variables('sqlServerName')).fullyQualifiedDomainName]"
+    },
+    "dbName": {
+      "type": "string",
+      "value": "[reference(variables('databaseName')]"
+    },
+    "ServerFqdn": {
+      "type": "string",
+      "value": "[reference(variables('publicIPName')).dnsSettings.fqdn]"
+    }
+  }
 }

@@ -15,7 +15,7 @@ Configuration Main
 
     Node $nodeName
     {
-        if ($nodeName -contains "prod"){
+        if ($nodeName -match "prod"){
             WindowsFeature WebCompression {
                 Ensure = "Present"
                 Name = "Web-Dyn-Compression"
