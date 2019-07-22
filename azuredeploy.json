@@ -310,9 +310,13 @@
     }
   ],
   "outputs": {
-    "DatabaseConnectionString": {
+    "SqlFqdn": {
       "type": "string",
-      "value": "[concat('Server=tcp:',reference(variables('sqlserverName')).fullyQualifiedDomainName,',1433;Initial Catalog=',variables('databaseName'),';Persist Security Info=False;User ID=',reference(variables('sqlserverName')).administratorLogin,';Password=',reference(variables('sqlserverName')).administratorLoginPassword,';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+      "value": "[reference(variables('sqlserverName')).fullyQualifiedDomainName]"
+    },
+    "dbName": {
+      "type": "string",
+      "value": "[variables('databaseName')]"
     },
     "ServerFqdn": {
       "type": "string",
