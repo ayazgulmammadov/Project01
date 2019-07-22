@@ -117,7 +117,7 @@ Configuration Main
         }
         xWebsite WebSite {
             Ensure       = "Present"
-            Name         = "Project1"
+            Name         = "Blogge"
             State        = "Started"
             PhysicalPath = "C:\inetpub\wwwroot\Blogge"
             ApplicationPool = "BloggeAppPool"
