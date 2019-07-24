@@ -4,29 +4,32 @@ Configuration Main
     Param ( 
         [string] $nodeName,
         [string] $certUri,
-        [string] $certPass
+        [string] $DscCertUri,
+        [string] $Thumbprint,
+        [pscredential] $Credential,
+        [pscredential] $DscCertCredential
     )
 
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xCertificate
+    Import-DscResource -ModuleName CertificateDsc
     Import-DscResource -ModuleName xPSDesiredStateConfiguration
     Import-DscResource -ModuleName xWebAdministration
 
 
-    Node $nodeName
+    Node $AllNodes.NodeName
     {
-        if ($nodeName -match "prod"){
+        if ($nodeName -match "prod") {
             WindowsFeature WebCompression {
-                Ensure = "Present"
-                Name = "Web-Dyn-Compression"
+                Ensure    = "Present"
+                Name      = "Web-Dyn-Compression"
                 DependsOn = "[WindowsFeature]InstallWebServer"
             }
-            xWebAppPoolDefaults PoolDefaults
-            {
-                ApplyTo                 = 'Machine'
-                ManagedRuntimeVersion   = 'v4.0'
-                IdentityType            = 'LocalSystem'
-                DependsOn = "[xWebAppPool]BloggeAppPool"
+            xWebAppPoolDefaults PoolDefaults {
+                ApplyTo               = "Machine"
+                ManagedRuntimeVersion = "v4.0"
+                IdentityType          = "LocalSystem"
+                DependsOn             = "[xWebAppPool]BloggeAppPool"
             }
         }
         WindowsFeature InstallWebServer {
@@ -49,8 +52,8 @@ Configuration Main
             DependsOn = "[WindowsFeature]InstallWebServer"
         }
         WindowsFeature WindowsAuthentication {
-            Name   = "Web-Windows-Auth"
-            Ensure = "Present"
+            Name      = "Web-Windows-Auth"
+            Ensure    = "Present"
             DependsOn = "[WindowsFeature]InstallWebServer"
         }
         xRemoteFile DownloadURLRewrite {
@@ -64,6 +67,10 @@ Configuration Main
         xRemoteFile CopyCert {
             Uri             = "$certUri"
             DestinationPath = "C:\ayaz.javid.club.pfx"
+        }
+        xRemoteFile CopyDscCert {
+            Uri = "$DscCertUri"
+            DestinationPath = "C:\DscPrivateKey.pfx"
         }
         File CreateFolder {
             Ensure          = "Present"
@@ -87,24 +94,24 @@ Configuration Main
             DependsOn = @("[xRemoteFile]DownloadWebDeploy", "[WindowsFeature]InstallWebMgmtService")
         }
         Service WebMgmtService {
-            Name = "WMSVC"
+            Name        = "WMSVC"
             StartupType = "Automatic"
-            State = "Running"
-            DependsOn = @("[Registry]RemoteManagement", "[Package]InstallWebDeploy")
+            State       = "Running"
+            DependsOn   = @("[Registry]RemoteManagement", "[Package]InstallWebDeploy")
         }
         Service WebDeployRemoteAgent {
-            Name = "MsDepSvc"
+            Name        = "MsDepSvc"
             StartupType = "Automatic"
-            State = "Running"
-            DependsOn = @("[Registry]RemoteManagement", "[Package]InstallWebDeploy")
+            State       = "Running"
+            DependsOn   = @("[Registry]RemoteManagement", "[Package]InstallWebDeploy")
         }
         Registry RemoteManagement {
-            Key = 'HKLM:\SOFTWARE\Microsoft\WebManagement\Server'
-            ValueName = 'EnableRemoteManagement'
-            ValueType = 'Dword'
-            ValueData = '1'
+            Key       = "HKLM:\SOFTWARE\Microsoft\WebManagement\Server"
+            ValueName = "EnableRemoteManagement"
+            ValueType = "Dword"
+            ValueData = "1"
             DependsOn = "[WindowsFeature]InstallWebMgmtService"
-       }
+        }
         xWebsite DefaultSite {
             Ensure       = "Present"
             Name         = "Default Web Site"
@@ -116,13 +123,13 @@ Configuration Main
             Name = "BloggeAppPool"
         }
         xWebsite WebSite {
-            Ensure       = "Present"
-            Name         = "Blogge"
-            State        = "Started"
-            PhysicalPath = "C:\inetpub\wwwroot\Blogge"
+            Ensure          = "Present"
+            Name            = "Blogge"
+            State           = "Started"
+            PhysicalPath    = "C:\inetpub\wwwroot\Blogge"
             ApplicationPool = "BloggeAppPool"
-            DependsOn    = @("[File]CreateFolder", "[Script]InstallCert", "[xWebAppPool]BloggeAppPool")
-            BindingInfo  = @(
+            DependsOn       = @("[File]CreateFolder", "[xPfxImport]InstallCert", "[xWebAppPool]BloggeAppPool")
+            BindingInfo     = @(
                 MSFT_xWebBindingInformation {
                     Protocol  = "HTTP" 
                     Port      = "80"
@@ -139,9 +146,29 @@ Configuration Main
                 }
             )
         }
-        Script InstallCert {
+        xPfxImport InstallCert {
+            Thumbprint = "2a1a6970207203c05247510e287c4bd820d2e8b6"
+            Path       = "C:\ayaz.javid.club.pfx"
+            Location   = "LocalMachine"
+            Store      = "WebHosting"
+            Credential = $Credential
+            DependsOn  = @("[xRemoteFile]CopyCert", "[xPfxImport]InstallDscCert")
+        }
+        xPfxImport InstallDscCert {
+            Thumbprint = "$Thumbprint"
+            Path       = "C:\DscPrivateKey.pfx"
+            Location   = "LocalMachine"
+            Store      = "My"
+            Credential = $DscCertCredential
+            DependsOn  = "[xRemoteFile]CopyDscCert"
+        }
+        LocalConfigurationManager
+        {
+            CertificateId = $Thumbprint
+        }
+        <#Script InstallCert {
             TestScript = {
-                if ((Get-ChildItem Cert:\LocalMachine\WebHosting).Thumbprint -contains "‎2a1a6970207203c05247510e287c4bd820d2e8b6") { return $true }
+                if ((Get-ChildItem Cert:\LocalMachine\WebHosting).Thumbprint -contains "‎$Thumbprint") { return $true }
                 else { return $false }
             }
             SetScript  = {
@@ -154,6 +181,7 @@ Configuration Main
                 return @{result = $certs.Thumbprint }
             }
             DependsOn  = "[xRemoteFile]CopyCert"
-        }
+        }#>
+
     }
 }

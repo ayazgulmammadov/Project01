@@ -35,6 +35,9 @@
       "type": "string",
       "minLength": 1
     },
+    "certThumbprint": {
+      "type": "string"
+    },
     "_artifactsLocation": {
       "type": "string",
       "metadata": {
@@ -55,7 +58,10 @@
       "type": "securestring"
     },
     "certPassword": {
-      "type": "string"
+      "type": "securestring"
+    },
+    "dscCertPassword": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -212,11 +218,22 @@
               "configurationArguments": {
                 "nodeName": "[parameters('vmName')]",
                 "certUri": "[concat(parameters('_artifactsLocation'), '/', 'Cert', '/', 'ayaz.javid.club.pfx', parameters('_artifactsLocationSasToken'))]",
-                "certPass": "[parameters('certPassword')]"
+                "DscCertUri": "[concat(parameters('_artifactsLocation'), '/', 'Cert', '/', 'DscPrivateKey.pfx', parameters('_artifactsLocationSasToken'))]",
+                "Thumbprint":  "[parameters('certThumbprint')]"
               }
             },
             "protectedSettings": {
-              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]"
+              "configurationUrlSasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationArguments": {
+                "Credential": {
+                  "userName": "username",
+                  "password": "[parameters('certPassword')]"
+                },
+                "DscCertCredential": {
+                  "userName": "username",
+                  "password": "[parameters('dscCertPassword')]"
+                }
+              }
             }
           }
         }
