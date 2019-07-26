@@ -314,7 +314,7 @@
               ],
               "properties": {
                 "storageKeyType": "StorageAccessKey",
-                "storageKey": "QYYWlK9mvvPs5YvUMBspINrdCKdRBB7wg2PhYq0IGLxj4uv1m/hGsTA+1MiqaOJacNGvYiYMCSRY2NJC6BbGhw==",
+                "storageKey": "?sv=2017-07-29&sr=b&sig=8WQUAFnqHr441r%2FXhMWIVlcbfUi7bA1ocMl6WV%2F%2Bx4w%3D&st=2019-07-26T08%3A46%3A22Z&se=2019-07-27T08%3A46%3A22Z&sp=rwd",
                 "storageUri": "https://dbbackupblogge.blob.core.windows.net/dbbackup/newBlog.bacpac",
                 "administratorLogin": "[parameters('sqlServerAdminLogin')]",
                 "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
@@ -338,6 +338,14 @@
     "ServerFqdn": {
       "type": "string",
       "value": "[reference(variables('publicIPName')).dnsSettings.fqdn]"
+    },
+    "vmAdminUserName": {
+      "type": "string",
+      "value": "[concat(parameters('vmName'), '\\', parameters('vmAdminUserName')]"
+    },
+    "sqlServerAdminLogin": {
+      "type": "string",
+      "value": "[concat(parameters('sqlServerAdminLogin'), '@', reference(variables('sqlserverName')).fullyQualifiedDomainName)]"
     }
   }
 }

@@ -49,13 +49,23 @@
       "value": "adminuser"
     },
     "vmAdminPassword": {
-      "value": "A123456789a!"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "vmAdminPassword"
+      }
     },
     "sqlServerAdminLogin": {
       "value": "sqlsuperadm"
     },
     "sqlServerAdminPassword": {
-      "value": "A123456789a!"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "sqlServerAdminPassword"
+      }
     },
     "certThumbprint": {
       "value": "00136DDC030650835B82A1220B09F8E22856F91E"
@@ -64,10 +74,20 @@
       "value": "blogge-dev-public"
     },
     "certPassword": {
-      "value": "A123456789a"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "certPassword"
+      }
     },
     "dscCertPassword": {
-      "value": "YOUR_PFX_PASSWD"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "dscCertPassword"
+      }
     }
   }
 }

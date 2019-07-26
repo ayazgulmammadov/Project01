@@ -12,7 +12,6 @@ Configuration Main
 
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xCertificate
-    Import-DscResource -ModuleName CertificateDsc
     Import-DscResource -ModuleName xPSDesiredStateConfiguration
     Import-DscResource -ModuleName xWebAdministration
 
