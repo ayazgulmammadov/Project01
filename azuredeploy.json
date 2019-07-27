@@ -337,6 +337,7 @@
           "type": "virtualNetworkRules",
           "apiVersion": "2015-05-01-preview",
           "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]",
             "[concat(resourceId('Microsoft.Sql/servers', variables('sqlServerName')), '/databases/', variables('databaseName'), '/extensions/', 'Import')]"
           ],
           "properties": {
