@@ -319,7 +319,8 @@
               "type": "extensions",
               "apiVersion": "2014-04-01-preview",
               "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('databaseName'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('databaseName'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'Microsoft.Powershell.DSC')]"
               ],
               "properties": {
                 "storageKeyType": "SharedAccessKey",
