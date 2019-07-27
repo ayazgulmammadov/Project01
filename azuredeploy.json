@@ -57,6 +57,15 @@
     "sqlServerAdminPassword": {
       "type": "securestring"
     },
+    "sasToken": {
+      "type": "string"
+    },
+    "storageUri": {
+      "type": "string"
+    },
+    "bacpacFileName": {
+      "type": "string"
+    },
     "certPassword": {
       "type": "securestring"
     },
@@ -313,15 +322,27 @@
                 "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('databaseName'))]"
               ],
               "properties": {
-                "storageKeyType": "StorageAccessKey",
-                "storageKey": "?sv=2017-07-29&sr=b&sig=8WQUAFnqHr441r%2FXhMWIVlcbfUi7bA1ocMl6WV%2F%2Bx4w%3D&st=2019-07-26T08%3A46%3A22Z&se=2019-07-27T08%3A46%3A22Z&sp=rwd",
-                "storageUri": "https://dbbackupblogge.blob.core.windows.net/dbbackup/newBlog.bacpac",
+                "storageKeyType": "SharedAccessKey",
+                "storageKey": "[parameters('sasToken')]",
+                "storageUri": "[concat(parameters('storageUri'), '/', parameters('bacpacFileName'))]",
                 "administratorLogin": "[parameters('sqlServerAdminLogin')]",
                 "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
                 "operationMode": "Import"
               }
             }
           ]
+        },
+        {
+          "name": "allowVNetConnection",
+          "type": "virtualNetworkRules",
+          "apiVersion": "2015-05-01-preview",
+          "dependsOn": [
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlServerName')), '/databases/', variables('databaseName'), '/extensions/', 'Import')]"
+          ],
+          "properties": {
+            "virtualNetworkSubnetId": "[variables('vmSubnetRef')]",
+            "ignoreMissingVnetServiceEndpoint": true
+          }
         }
       ]
     }
@@ -341,11 +362,15 @@
     },
     "vmAdminUserName": {
       "type": "string",
-      "value": "[concat(parameters('vmName'), '\\', parameters('vmAdminUserName')]"
+      "value": "[concat(parameters('vmName'), '\\', parameters('vmAdminUserName'))]"
     },
     "sqlServerAdminLogin": {
       "type": "string",
       "value": "[concat(parameters('sqlServerAdminLogin'), '@', reference(variables('sqlserverName')).fullyQualifiedDomainName)]"
+    },
+    "DatabaseConnectionString": {
+      "type": "string",
+      "value": "[concat('Server=tcp:',reference(variables('sqlserverName')).fullyQualifiedDomainName,',1433;Initial Catalog=',variables('databaseName'),';Persist Security Info=False;User ID=',reference(variables('sqlserverName')).administratorLogin,';Password=',parameters('sqlServerAdminPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
     }
   }
 }
