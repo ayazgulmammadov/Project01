@@ -1,95 +1,130 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "envPrefix": {
-            "value": "prod-",
-            "metadata": {
-                "description": "Enviroment prefix"
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "envPrefix": {
+      "value": "prod-",
+      "metadata": {
+        "description": "Enviroment prefix"
+      }
+    },
+    "nsgSecurityRules": {
+      "value": {
+        "securityRules": [
+          {
+            "name": "Allow8172",
+            "properties": {
+              "description": "Allow port 8172",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "8172",
+              "protocol": "Tcp",
+              "direction": "Inbound",
+              "priority": 100,
+              "access": "Allow"
             }
-        },
-        "nsgSecurityRules": {
-            "value": {
-                "securityRules": [
-                    {
-                        "name": "Allow8172",
-                        "properties": {
-                            "description": "Allow port 8172",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "8172",
-                            "protocol": "Tcp",
-                            "direction": "Inbound",
-                            "priority": 100,
-                            "access": "Allow"
-                        }
-                    },
-                    {
-                        "name": "Allow80",
-                        "properties": {
-                            "description": "Allow port 80",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "80",
-                            "protocol": "Tcp",
-                            "direction": "Inbound",
-                            "priority": 101,
-                            "access": "Allow"
-                        }
-                    },
-                    {
-                        "name": "Allow443",
-                        "properties": {
-                            "description": "Allow port 443",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "443",
-                            "protocol": "Tcp",
-                            "direction": "Inbound",
-                            "priority": 102,
-                            "access": "Allow"
-                        }
-                    },
-                    {
-                        "name": "DenyPublicInbound",
-                        "properties": {
-                          "description": "Block all public incoming traffic",
-                          "sourceAddressPrefix": "Internet",
-                          "sourcePortRange": "*",
-                          "destinationAddressPrefix": "VirtualNetwork",
-                          "destinationPortRange": "*",
-                          "protocol": "*",
-                          "direction": "Inbound",
-                          "priority": 103,
-                          "access": "Deny"
-                        }
-                    }
-                ]
+          },
+          {
+            "name": "Allow80",
+            "properties": {
+              "description": "Allow port 80",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "80",
+              "protocol": "Tcp",
+              "direction": "Inbound",
+              "priority": 101,
+              "access": "Allow"
             }
-        },
-        "vmName": {
-            "value": "prod-vm01"
-        },
-        "vmAdminUserName": {
-            "value": "adminuser"
-        },
-        "vmAdminPassword": {
-            "value": "A123456789a!"
-        },
-        "sqlServerAdminLogin": {
-            "value": "sqlsuperadmin"
-        },
-        "sqlServerAdminPassword": {
-            "value": "A123456789a!"
-        },
-        "publicIPDnsName": {
-            "value": "blogge-prod-public"
-        },
-        "certPassword": {
-            "value": "A123456789a"
+          },
+          {
+            "name": "Allow443",
+            "properties": {
+              "description": "Allow port 443",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443",
+              "protocol": "Tcp",
+              "direction": "Inbound",
+              "priority": 102,
+              "access": "Allow"
+            }
+          },
+          {
+            "name": "DenyPublicInbound",
+            "properties": {
+              "description": "Block all public incoming traffic",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRange": "*",
+              "protocol": "*",
+              "direction": "Inbound",
+              "priority": 103,
+              "access": "Deny"
+            }
           }
+        ]
+      }
+    },
+    "vmName": {
+      "value": "prod-vm01"
+    },
+    "vmAdminUserName": {
+      "value": "adminuser"
+    },
+    "vmAdminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "vmAdminPassword"
+      }
+    },
+    "sqlServerAdminLogin": {
+      "value": "sqlsuperadm"
+    },
+    "sqlServerAdminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "sqlServerAdminPassword"
+      }
+    },
+    "sasToken": {
+      "value": "#{storageToken}#"
+    },
+    "storageUri": {
+      "value": "#{storageUri}#"
+    },
+    "bacpacFileName": {
+      "value": "newBlog.bacpac"
+    },
+    "certThumbprint": {
+      "value": "00136DDC030650835B82A1220B09F8E22856F91E"
+    },
+    "publicIPDnsName": {
+      "value": "blogge-dev-public"
+    },
+    "certPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "certPassword"
+      }
+    },
+    "dscCertPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+        },
+        "secretName": "dscCertPassword"
+      }
     }
+  }
 }
