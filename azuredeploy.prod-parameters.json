@@ -108,7 +108,7 @@
       "value": "00136DDC030650835B82A1220B09F8E22856F91E"
     },
     "publicIPDnsName": {
-      "value": "blogge-dev-public"
+      "value": "blogge-prod-public"
     },
     "certPassword": {
       "reference": {
