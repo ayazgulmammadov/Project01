@@ -51,7 +51,7 @@
     "vmAdminPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{resourceGroup}#/providers/Microsoft.KeyVault/vaults/#{vaultName}#"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "vmAdminPassword"
       }
@@ -62,7 +62,7 @@
     "sqlServerAdminPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{resourceGroup}#/providers/Microsoft.KeyVault/vaults/#{vaultName}#"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "sqlServerAdminPassword"
       }
@@ -85,7 +85,7 @@
     "certPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{resourceGroup}#/providers/Microsoft.KeyVault/vaults/#{vaultName}#"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "certPassword"
       }
@@ -93,7 +93,7 @@
     "dscCertPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{resourceGroup}#/providers/Microsoft.KeyVault/vaults/#{vaultName}#"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "dscCertPassword"
       }
