@@ -79,7 +79,7 @@
     "vmAdminPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "vmAdminPassword"
       }
@@ -90,7 +90,7 @@
     "sqlServerAdminPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "sqlServerAdminPassword"
       }
@@ -113,7 +113,7 @@
     "certPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "certPassword"
       }
@@ -121,7 +121,7 @@
     "dscCertPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/956299bb-8825-464d-a682-38b7c674bc7c/resourceGroups/AzKeyVaultsRG/providers/Microsoft.KeyVault/vaults/BloggeProjectKeys"
+          "id": "/subscriptions/#{subscriptionId}#/resourceGroups/#{KeyVaultResGroup}#/providers/Microsoft.KeyVault/vaults/#{KeyVaultName}#"
         },
         "secretName": "dscCertPassword"
       }
